@@ -58,9 +58,9 @@ class Trick
     private $date_update;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Media", mappedBy="trick", cascade={"persist", "remove"})
+     * ORM\OneToMany(targetEntity="App\Entity\Media", mappedBy="trick", cascade={"persist", "remove"})
      */
-    private $medias;
+    protected $medias;
 
 
     public function getId(): ?int
@@ -130,8 +130,9 @@ class Trick
      */
     public function addMedia(Media $media)
     {
-       $this->medias[] = $media;
-       return $this;
+        //$media->addTrick($this);
+        $this->medias->add($media);
+        return $this;
     }
 
     public function removeMedia(Media $media)

@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use App\Entity\Trick;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\MediaRepository")
@@ -115,10 +116,9 @@ class Media
         return $this->trick;
     }
 
-    public function setTrick(Trick $trick): self
-    {
+    public function setTrick(Trick $trick): Trick
+    {   
         $this->trick = $trick;
-
-        return $this;
+        return $this->trick;
     }
 }

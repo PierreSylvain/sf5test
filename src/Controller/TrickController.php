@@ -1,14 +1,17 @@
 <?php
 
-// src/Controller/TrickController.php
 
 namespace App\Controller;
 
 use App\Entity\Trick;
 use App\Entity\Media;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Repository\TrickRepository;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use App\Form\TrickType;
+/*
+use App\Repository\TrickRepository;
+;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Service\UploaderHelper;
@@ -18,126 +21,58 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+
 use Symfony\Component\HttpFoundation\Session\Session;
 use Doctrine\Common\Persistence\ObjectManager;
+*/
 use Symfony\Component\Routing\Annotation\Route;
 use Twig\Environment;
-
 class TrickController extends AbstractController
 {
     /**
      * Ajouter une figure
-     * @Route("trick/add", name="app_trick_add", methods={"GET","POST"})
+     * @Route("trick/add")
      * @param Request $request
-     * @param UploaderHelper $UploaderHelper
      * @return Response
      */
     public function add(Request $request) : Response
     {
+        // Create trick entity
         $trick = new Trick();
 
-        //$media = new Media();
-        //$media->setTrick($trick);
-        //$media->setName('psa');
-        //$media->setCaption('CAPTION');
-        //$media->setUrl('http://youtube.com');
-        //$trick->addMedia($media);
-        //echo '<pre>';
-        //print_r($trick);exit;
+        // Create First media and add to trick
+        $media = new Media();
+        $trick->getMedias()->add($media);
+
+        // Create Second media and add to trick
+        //$media2 = new Media();       
+        //$trick->getMedias()->add($media2);
+       
         $form = $this->createForm(TrickType::class, $trick);
         $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
 
-        if ($form->isSubmitted() && $form->isValid()) {         
+            // à faire plutôt dans un service
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($trick);
             $entityManager->flush();
-
-            $this->addFlash(
-                'notice',
-                'Trick enregistré avec succès !'
-            );
             
-            return $this->redirectToRoute('app_trick_home');
+            $files = $trick->getMedias(); 
+            foreach($files as $file){
+                $media = new Media();
+                $media->setName($file->getName());
+                $media->setCaption($file->getCaption());
+                $media->setUrl('xxxx');
+                $now = new \DateTime();
+                $media->setDateAdd($now);
+                $media->setTrick($trick);
+                $entityManager->persist($media);
+                $entityManager->flush(); 
+            }                            
         }
-
-        return $this->render('Trick/add.html.twig', [
+        return $this->render('add.html.twig', [
             'form' => $form->createView(),
         ]);
-    }
-
-    /**
-     * Détails d'un trick
-     * @Route("trick/view/{id}", name="app_trick_view", requirements={"id" = "\d+"})
-     */
-    public function view($id, Request $request, TrickRepository $trickRepo)
-    {
-        return $this->render(
-            'Trick/view.html.twig',
-            ['id' => $id]
-        );
-    }
-
-    /**
-     * Modifier un trick
-     * @Route("trick/edit/{id}", name="app_trick_edit", requirements={"id" = "\d+"})
-     */
-    public function edit($id, Request $request, UploaderHelper $uploaderHelper) : Response
-    {
-        $entityManager = $this->getDoctrine()->getManager();
-        $trick = $entityManager->getRepository(Trick::class)->find($id);
-
-        if (!$trick) {
-            throw $this->createNotFoundException(
-                'Aucun trick avec l\'identifiant '.$id. ' n\'a été trouvé'
-            );
-        }
-
-        $form = $this->createForm(TrickType::class, $trick);
-
-        $form->handleRequest($request);
-
-        if($form->isSubmitted() && $form->isValid())
-        {
-            $media = $form['mediaName']->getData();
-            $uploaderHelper->uploadTrickFile($media, $trick);
-
-            $trick->setDateUpdate(new \DateTime('+ 1 hour'));
-            $entityManager->flush();
-
-            $this->addFlash(
-                'success',
-                'Le trick <strong>' . $trick->getName() . '</strong> a bien été modifié !'
-            );
-
-            return $this->redirectToRoute('app_trick_home', [
-                'id' => $trick->getId()
-            ]);
-        }
-
-        return $this->render('Trick/edit.html.twig', [
-            'form' => $form->createView()
-        ]);
-    }
-
-    /**
-     * Supprimer un trick
-     * @Route("trick/delete/{id}", name="app_trick_delete", requirements={"id" = "\d+"})
-     */
-    public function delete($id, Request $request) : Response
-    {
-        $entityManager = $this->getDoctrine()->getManager();
-        $trick = $entityManager->getRepository(Trick::class)->find($id);
-
-        $entityManager->remove($trick);
-        $entityManager->flush();
-
-        $this->addflash(
-            'success',
-            "Le trick <strong>{$trick->getName()}</strong> a été supprimé avec succès !"
-        );
-
-        return $this->redirectToRoute('app_trick_home');
     }
 }

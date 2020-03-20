@@ -1,0 +1,10 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+{{ form_start(form) }}
+    {% for media in form.medias %}
+    {{ form_row(media) }}
+    {% endfor %}
+{{ form_end(form) }}
+{% endblock %}
+
