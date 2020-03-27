@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Entity\Trick;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\MediaRepository")
@@ -33,11 +33,10 @@ class Media
 
     /**
      * @ORM\Column(type="string", length=255)
-     * 
+     *
      */
     private $caption;
 
-    
     /**
      * @ORM\Column(type="string", length=255)
      */
@@ -56,12 +55,29 @@ class Media
      */
     private $trick;
 
+    /**
+     * @var UploadedFile
+     */
+    protected $file;
+
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    public function setFile(UploadedFile $file): self
+    {
+        $this->file = $file;
+
+        return $this;
+    }
+
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    
     public function getName(): ?string
     {
         return $this->name;
@@ -85,7 +101,6 @@ class Media
 
         return $this;
     }
-
 
     public function getUrl(): ?string
     {
@@ -117,7 +132,7 @@ class Media
     }
 
     public function setTrick(Trick $trick): Trick
-    {   
+    {
         $this->trick = $trick;
         return $this->trick;
     }

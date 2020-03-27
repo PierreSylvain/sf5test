@@ -9,22 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Form\TrickType;
-/*
-use App\Repository\TrickRepository;
-;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use App\Service\UploaderHelper;
-use App\Service\VideoUploader;
-use Gedmo\Sluggable\Util\Urlizer;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\UrlType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 
-use Symfony\Component\HttpFoundation\Session\Session;
-use Doctrine\Common\Persistence\ObjectManager;
-*/
 use Symfony\Component\Routing\Annotation\Route;
 use Twig\Environment;
 class TrickController extends AbstractController
@@ -37,6 +22,7 @@ class TrickController extends AbstractController
      */
     public function add(Request $request) : Response
     {
+       
         // Create trick entity
         $trick = new Trick();
 
@@ -57,19 +43,44 @@ class TrickController extends AbstractController
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($trick);
             $entityManager->flush();
+
+            // Manage uploded files
+            $uploads = $trick->getMedias(); 
             
-            $files = $trick->getMedias(); 
-            foreach($files as $file){
+            // Show data
+            //dump($uploads);die;
+
+            foreach($uploads as $upload){
+                /** @var UploadedFile $file */
+                $file = $upload->getFile(); 
+                /*
+                     Do what you have to do with UploadedFile class
+                     ----------------------------------------------
+
+                Symfony\Component\HttpFoundation\File\UploadedFile Object
+                (
+                    [test:Symfony\Component\HttpFoundation\File\UploadedFile:private] => 
+                    [originalName:Symfony\Component\HttpFoundation\File\UploadedFile:private] => filename.pdf
+                    [mimeType:Symfony\Component\HttpFoundation\File\UploadedFile:private] => application/pdf
+                    [error:Symfony\Component\HttpFoundation\File\UploadedFile:private] => 0
+                    [pathName:SplFileInfo:private] => /tmp/phpYwBKvJ
+                    [fileName:SplFileInfo:private] => phpYwBKvJ
+                )
+                */
+                
                 $media = new Media();
-                $media->setName($file->getName());
-                $media->setCaption($file->getCaption());
+                $media->setName('name-of-the-file.png');
+                $media->setCaption($upload->getCaption());
                 $media->setUrl('xxxx');
                 $now = new \DateTime();
                 $media->setDateAdd($now);
                 $media->setTrick($trick);
                 $entityManager->persist($media);
                 $entityManager->flush(); 
-            }                            
+            }
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($trick);
+            $entityManager->flush();            
         }
         return $this->render('add.html.twig', [
             'form' => $form->createView(),

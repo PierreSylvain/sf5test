@@ -11,11 +11,12 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\HttpFoundation\File\File;
+//use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class TrickType extends AbstractType
 {
@@ -39,10 +40,9 @@ class TrickType extends AbstractType
             ])
             ->add('medias', CollectionType::class, [                    
                 'entry_type' => MediaType::class,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'by_reference' => false
-            ])        
+                'entry_options' => array('label' => false),
+                'allow_add' => true,                
+            ])                     
             ->add('save', SubmitType::class, [
                 'label'=>'Ajouter'
             ])

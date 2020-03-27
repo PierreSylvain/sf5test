@@ -60,7 +60,7 @@ class Trick
     /**
      * ORM\OneToMany(targetEntity="App\Entity\Media", mappedBy="trick", cascade={"persist", "remove"})
      */
-    protected $medias;
+    private $medias;
 
 
     public function getId(): ?int
@@ -130,8 +130,10 @@ class Trick
      */
     public function addMedia(Media $media)
     {
-        //$media->addTrick($this);
-        $this->medias->add($media);
+        if (!$this->medias->contains($media)) {
+            $this->medias[] = $media;
+            $media->setTrick($this);
+        }
         return $this;
     }
 
