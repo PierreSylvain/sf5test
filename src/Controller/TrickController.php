@@ -48,7 +48,7 @@ class TrickController extends AbstractController
             $uploads = $trick->getMedias(); 
             
             // Show data
-            //dump($uploads);die;
+            dump($uploads);
 
             foreach($uploads as $upload){
                 /** @var UploadedFile $file */
