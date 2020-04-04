@@ -17,3 +17,4 @@
 
 ### vscode
 *.code-workspace
+.idea
