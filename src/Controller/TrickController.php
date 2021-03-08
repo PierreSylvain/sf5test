@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Form\TrickType;
-
+use App\Repository\MediaRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Twig\Environment;
 class TrickController extends AbstractController
@@ -85,5 +85,17 @@ class TrickController extends AbstractController
         return $this->render('add.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    /**
+     * Détails d'un trick
+     * @Route("trick/view/{id}", name="app_trick_view", requirements={"id" = "\d+"})
+     */
+    public function view(Trick $trick,  MediaRepository $mediaRepository)
+    {
+	    $medias = $mediaRepository->findBy(['trick' => $trick->getId()]);
+	    dump($trick);
+	    dump($medias);
+	    return $this->render('home.html.twig', []);
     }
 }
